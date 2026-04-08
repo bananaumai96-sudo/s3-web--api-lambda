@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Serverless App</title>
+
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+
+</head>
+<body>
+  <h1>Serverless Test</h1>
+  <input id="getID" type="text" placeholder="IDを入力">
+  <button onclick="callApi()">名前呼び出し</button>
+
+  <p id="getResult"></p>
+  
+  <hr>
+  
+   <h2>データ登録</h2>
+  <input id="name" type="text" placeholder="名前を入力">
+  <button onclick="sendData()">名前送信</button>
+
+  <p id="postResult"></p>
+  
+
+  <hr>
+  <h3>複数データ登録</h3>
+  <input type="text" id="names" placeholder="名前"><br><br> 
+  <input type="text" id="department" placeholder="部署"><br><br> 
+  <input type="email" id="email" placeholder="メール"><br><br>
+  <button onclick="sendsData()">登録</button>
+
+  <p id="postsResult"></p>
+
+  <hr>
+  <h3>メアド検索</h3>
+  <input type="email" id="hit-email" placeholder="メール"><br><br>
+  <button onclick="getsData()">検索</button>
+  <p id="getsResult"></p>
+
+  <script>
+    const API_URL= "https://1d8qltnyd5.execute-api.ap-northeast-1.amazonaws.com";
+
+    async function callApi() {
+    const id = document.getElementById("getID").value;
+    const res = await fetch(`${API_URL}/hello?id=${id}`);
+    const text = await res.text();
+    document.getElementById("getResult").innerText = text;
+  }
+    async function sendData() {
+      const name = document.getElementById("name").value;
+
+      const res = await fetch(`${API_URL}/hello`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: name })
+      });
+
+      const text = await res.text();
+      document.getElementById("postResult").innerText = text;
+    }
+
+    async function sendsData() {
+      const name = document.getElementById("names").value;
+      const department = document.getElementById("department").value;
+      const email = document.getElementById("email").value;
+      
+      if (!name || !department || !email) {
+        alert("全部入力して！");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name,
+            department: department,
+            email: email
+          })
+        });
+        const text = await res.text();
+        document.getElementById("postsResult").innerText = text;
+    } catch(e){
+      document.getElementById("result").innerText = "エラー：" + e;
+    }
+  }
+
+  async function getsData() {
+      const email = document.getElementById("hit-email").value;
+      const resultDiv = document.getElementById("getsResult");
+
+        if (!email) {
+        document.getElementById("getsResult").innerText = "";
+        alert("入力して！");
+        return;
+      }
+
+      try{
+        const res = await fetch(`${API_URL}/users?email=${email}`);
+        const data = await res.json();
+        // 空チェック
+        if (!data || data.length === 0) {
+          resultDiv.innerHTML = "該当データなし";
+          return;
+        }
+
+        // テーブル作成
+        let html = "<table><tr><th>ID</th><th>名前</th><th>部署</th><th>メール</th></tr>";
+        data.forEach(user => {
+          html += `<tr>
+            <td>${user.users_id}</td>
+            <td>${user.name}</td>
+            <td>${user.department}</td>
+            <td>${user.email}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        resultDiv.innerHTML = html;
+
+      }catch(e){
+        document.getElementById("getsResult").innerText = "エラー：" + e;
+      }
+  }
+
+  </script>
+  
+</body>
+</html>
