@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Serverless App</title>
+  <h1>Serverless Portfolio</h1>
 
   <style>
     table {
@@ -22,7 +23,7 @@
 
 </head>
 <body>
-  <h1>Serverless Test</h1>
+  <h2>userID検索</h2>
   <input id="getID" type="text" placeholder="IDを入力">
   <button onclick="callApi()">名前呼び出し</button>
 
@@ -30,7 +31,7 @@
   
   <hr>
   
-   <h2>データ登録</h2>
+   <h2>名前データ登録</h2>
   <input id="name" type="text" placeholder="名前を入力">
   <button onclick="sendData()">名前送信</button>
 
@@ -38,31 +39,53 @@
   
 
   <hr>
-  <h3>複数データ登録</h3>
+  <h2>複数データ登録</h2>
   <input type="text" id="names" placeholder="名前"><br><br> 
   <input type="text" id="department" placeholder="部署"><br><br> 
   <input type="email" id="email" placeholder="メール"><br><br>
   <button onclick="sendsData()">登録</button>
 
   <p id="postsResult"></p>
+  <p id="sendedData"></p>
 
   <hr>
-  <h3>メアド検索</h3>
+  <h2>メアド検索</h2>
   <input type="email" id="hit-email" placeholder="メール"><br><br>
   <button onclick="getsData()">検索</button>
   <p id="getsResult"></p>
 
   <script>
-    const API_URL= "https://1d8qltnyd5.execute-api.ap-northeast-1.amazonaws.com";
+    const API_URL= "https://3vspu02mwh.execute-api.ap-northeast-1.amazonaws.com";
 
     async function callApi() {
-    const id = document.getElementById("getID").value;
-    const res = await fetch(`${API_URL}/hello?id=${id}`);
-    const text = await res.text();
-    document.getElementById("getResult").innerText = text;
-  }
+      clearResults();
+      const id = document.getElementById("getID").value;
+      const resultDiv = document.getElementById("getResult");
+      resultDiv.innerHTML = "";
+      if (!id){
+        alert("入力して！");
+        return;
+      }
+      const res = await fetch(`${API_URL}/hello?id=${id}`);
+      const text = await res.json();
+
+      if (res.status === 200) {
+        resultDiv.innerHTML = text.saved;
+        document.getElementById("getID").value = ""
+      } else {
+        resultDiv.innerHTML = text.error;
+      }
+    }
+
     async function sendData() {
+      clearResults();
       const name = document.getElementById("name").value;
+      const resultDiv = document.getElementById("postResult");
+      resultDiv.innerHTML = "";  
+      if (!name){
+        alert("入力して！");
+        return;
+      }
 
       const res = await fetch(`${API_URL}/hello`, {
         method: "POST",
@@ -72,14 +95,23 @@
         body: JSON.stringify({ name: name })
       });
 
-      const text = await res.text();
-      document.getElementById("postResult").innerText = text;
+      const text = await res.json();
+
+      if (res.status === 200) {
+        resultDiv.innerHTML = text.saved;
+        document.getElementById("name").value = ""
+      } else {
+        resultDiv.innerHTML = text.error;
+      }
     }
 
     async function sendsData() {
+      clearResults();
       const name = document.getElementById("names").value;
       const department = document.getElementById("department").value;
       const email = document.getElementById("email").value;
+      const resultDiv = document.getElementById("postsResult");
+      resultDiv.innerHTML = "";  
       
       if (!name || !department || !email) {
         alert("全部入力して！");
@@ -98,14 +130,26 @@
             email: email
           })
         });
-        const text = await res.text();
-        document.getElementById("postsResult").innerText = text;
+        const text = await res.json();
+
+
+        if (res.status === 200) {
+          resultDiv.innerHTML = text.saved
+          document.getElementById("sendedData").innerHTML = "名前：" + name + "　部署：" + department + "　メール：" + email;
+          document.getElementById("names").value = "";
+          document.getElementById("department").value = "";
+          document.getElementById("email").value = "";
+        } else {
+          resultDiv.innerHTML = text.error;
+        }
+
     } catch(e){
-      document.getElementById("result").innerText = "エラー：" + e;
+      resultDiv.innerText = "エラー：" + e;
     }
   }
 
   async function getsData() {
+      clearResults();
       const email = document.getElementById("hit-email").value;
       const resultDiv = document.getElementById("getsResult");
 
@@ -140,6 +184,14 @@
       }catch(e){
         document.getElementById("getsResult").innerText = "エラー：" + e;
       }
+  }
+
+  function clearResults() {
+    document.getElementById("getResult").innerHTML = "";
+    document.getElementById("postResult").innerHTML = "";
+    document.getElementById("postsResult").innerHTML = "";
+    document.getElementById("getsResult").innerHTML = "";
+    document.getElementById("sendedData").innerHTML = "";
   }
 
   </script>
