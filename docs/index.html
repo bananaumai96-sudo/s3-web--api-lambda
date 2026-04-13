@@ -55,7 +55,7 @@
   <p id="getsResult"></p>
 
   <script>
-    const API_URL= "https://3vspu02mwh.execute-api.ap-northeast-1.amazonaws.com";
+    const API_URL= "https://xherzainli.execute-api.ap-northeast-1.amazonaws.com";
 
     async function callApi() {
       clearResults();
@@ -66,6 +66,12 @@
         alert("入力して！");
         return;
       }
+
+      if (/\s/.test(id)) {
+        alert("スペースは使えません");
+        return;
+      }
+
       const res = await fetch(`${API_URL}/hello?id=${id}`);
       const text = await res.json();
 
@@ -84,6 +90,11 @@
       resultDiv.innerHTML = "";  
       if (!name){
         alert("入力して！");
+        return;
+      }
+
+      if (/\s/.test(name)) {
+        alert("スペースは使えません");
         return;
       }
 
@@ -115,6 +126,11 @@
       
       if (!name || !department || !email) {
         alert("全部入力して！");
+        return;
+      }
+
+      if (/\s/.test(name) || /\s/.test(department) || /\s/.test(email)) {
+        alert("スペースは使えません");
         return;
       }
 
@@ -153,9 +169,14 @@
       const email = document.getElementById("hit-email").value;
       const resultDiv = document.getElementById("getsResult");
 
-        if (!email) {
+      if (!email) {
         document.getElementById("getsResult").innerText = "";
         alert("入力して！");
+        return;
+      }
+
+      if (/\s/.test(email)) {
+        alert("スペースは使えません");
         return;
       }
 

@@ -2,9 +2,30 @@ resource "aws_apigatewayv2_api" "api" {
   name          = "serverless-http-api"
   protocol_type = var.modules_api_protocol
   cors_configuration {
-  allow_origins = ["http://api-lambda-test-0001.s3-website-ap-northeast-1.amazonaws.com"]
-  allow_methods = ["GET", "POST", "OPTIONS"]
-  allow_headers = ["Content-Type"]
+  allow_origins = var.modules_api_allow_origins
+  allow_methods = var.modules_api_allow_methods
+  allow_headers = var.modules_api_allow_headers
 }
 
+}
+
+resource "aws_apigatewayv2_route" "get" {
+for_each = toset(var.modules_api_route)
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = each.value
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.api.id
+  name        = "$default"
+  auto_deploy = true
+}
+
+resource "aws_apigatewayv2_integration" "lambda" {
+  api_id                 = aws_apigatewayv2_api.api.id
+  integration_type       = var.modules_integration_type
+  integration_uri        = var.modules_integration_uri
+  integration_method     = var.modules_integration_method
+  payload_format_version = var.modules_payload_format_version
 }
