@@ -90,18 +90,9 @@ S3-api-Lambda/
 │
 ├─ dev/                                   # ルートモジュール
 │   ├─ .terraform.lock.hcl                # プロバイダー固定ファイル
-│   ├─ api_integration.tf                 # integration設定
-│   ├─ api_route.tf                       # route設定
-│   ├─ api_stage.tf                       # stage設定
 │   ├─ app.zip                            # Lambdaに渡すためのzip
-│   ├─ lambda_permission.tf               # lambdaのリソースベースのポリシー設定
-│   ├─ locals.tf                          # lambdaのリソースベースのポリシー設定
 │   ├─ main.tf                            # リソース作成用
 │   ├─ providers.tf                       # プロバイダー定義用
-│   ├─ s3_encryption.tf                   # S3暗号化用
-│   ├─ s3_pab.tf                          # S3パブリックアクセスブロック設定用
-│   ├─ s3_policy.tf                       # S3ポリシー用
-│   ├─ s3_website.tf                      # S3静的ウェブサイト設定用
 │   ├─ terraformtfvars.example            # 変数使用例
 │   └─ variables.tf                       # 変数用
 │
